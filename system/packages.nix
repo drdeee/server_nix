@@ -1,6 +1,10 @@
 { pkgs, ...}:
 {
 
+  environment.systemPackages =with pkgs; [
+    htop
+  ];
+
   programs.git = {
     enable = true;
     config = {
