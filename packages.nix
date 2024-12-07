@@ -1,6 +1,11 @@
 { pkgs, ...}:
 {
-  environment.systemPackages = with pkgs; [
-    git
-  ];
+
+  programs.git = {
+    enable = true;
+    config = {
+      init.defaultBranch = "main";
+      credential.helper = "store";
+    };
+  };
 }
