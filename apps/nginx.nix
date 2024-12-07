@@ -5,7 +5,8 @@ in {
     enable = true;
   };
 
-  security.acme.certs = {
-    defaults.email = "admin@systemlos.org"
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "admin@systemlos.org";
   };
 }
