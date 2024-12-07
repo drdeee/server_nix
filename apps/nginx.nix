@@ -9,4 +9,6 @@ in {
     acceptTerms = true;
     defaults.email = "admin@systemlos.org";
   };
+
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 }
