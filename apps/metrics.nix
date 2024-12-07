@@ -2,16 +2,22 @@
 let
   grafanaCfg = config.services.grafana.settings;
   prometheusCfg = config.services.prometheus;
-  FQDN = "metrics.zentrale-pirna.org";
+  fqdn = "metrics.systemlos.org";
 in
 {
   services.prometheus = {
     enable = true;
     port = 9000;
     globalConfig.scrape_interval = "30s";
-    exporters.node = {
-      enable = true;
-      port = 9100;
+    exporters = {
+      node = {
+        enable = true;
+        port = 9100;
+      };
+      nginx = {
+        enable = true;
+        port = 9101;
+      };
     };
 
     scrapeConfigs = [
@@ -23,19 +29,27 @@ in
           }
         ];
       }
+      {
+        job_name = "nginx";
+        static_configs = [
+          {
+            targets = ["localhost:${toString prometheusCfg.exporters.nginx.port}"];
+          }
+        ];
+      }
     ];
   };
 
   services.grafana = {
     enable = true;
     settings = {
-      server.domain = FQDN;
+      server.domain = fqdn;
       server.http_addr = "127.0.0.1";
       server.http_port = 9001;
     };
   };
 
-  services.nginx.virtualHosts."${FQDN}" = {
+  services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;
     enableACME = true;
     locations."/" = {
