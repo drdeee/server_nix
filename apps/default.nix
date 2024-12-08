@@ -2,7 +2,7 @@
   imports = [
     ./nginx.nix
     ./metrics.nix
-    ./auth.nix
+    ./ldap.nix
     ./postgresql.nix
   ];
 }
