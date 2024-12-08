@@ -8,6 +8,9 @@ in {
 
   services.lldap = {
     enable = true;
+    environment = {
+      LLDAP_LDAP_USER_PASS_FILE = config.sops.secrets."services/lldap/adminPassword".path;
+    };
     settings = {
       http_host = "127.0.0.1";
       http_port = 8001;
@@ -16,12 +19,29 @@ in {
       ldap_port = 3890;
       ldap_base_dn = "dc=${rootDomain},dc=${topDomain}";
       database_url = "postgresql:///lldap";
+      ldap_user_dn = "system";
+      ldap_user_email = "system@${rootDomain}.${topDomain}";
     };
   };
 
-  systemd.services.lldap.postStart = ''
+  sops.secrets."services/lldap/adminPassword" = {
+    owner = config.systemd.services.lldap.serviceConfig.User;
+  };
 
-  '';
+  users.users.lldap = {
+    isSystemUser = true;
+    linger = true;
+    group = "lldap";
+  };
+
+  users.groups.lldap = {};
+
+  systemd.services.lldap = {
+    postStart = ''
+
+    '';
+    serviceConfig.User = "lldap";
+  };
 
   services.postgresql.ensureUsers = lib.singleton {
     name = "lldap";
