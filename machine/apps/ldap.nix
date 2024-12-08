@@ -3,6 +3,7 @@ let
   cfg = config.services.lldap.settings;
   fqdn = "users.systemlos.org";
 in {
+
   services.lldap = {
     enable = true;
     settings = {
@@ -11,8 +12,14 @@ in {
       http_url = "https://${fqdn}";
       ldap_host = "127.0.0.1";
       ldap_base_dn = "dc=systemlos,dc=org";
-      database_url = "postgresql://lldap@/lldap?host=/run/postgresql";
+      database_url = "postgresql://lldap:${builtins.readFile sops.secrets."services/lldap/dbPassword".path}@localhost/lldap";
     };
+  };
+
+  sops.secrets."services/lldap/dbPassword" = {
+    mode = "0440";
+#    owner = "lldap";
+#    group = "lldap";
   };
 
   services.postgresql.ensureUsers = lib.singleton {
