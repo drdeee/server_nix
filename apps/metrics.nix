@@ -46,8 +46,18 @@ in
       server.domain = fqdn;
       server.http_addr = "127.0.0.1";
       server.http_port = 9001;
+      database = {
+        type = "postgres";
+        host = "/run/postgresql/";
+      };
     };
   };
+
+  services.postgresql.ensureUsers = lib.singleton {
+    name = "grafana";
+    ensureDBOwnership = true;
+  };
+  services.postgresql.ensureDatabases = ["grafana"];
 
   services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;
