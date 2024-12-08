@@ -3,6 +3,7 @@
 
   environment.systemPackages =with pkgs; [
     htop
+    sops
   ];
 
   programs.git = {
