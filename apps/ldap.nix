@@ -1,4 +1,4 @@
-{config, ...}:
+{config, lib, ...}:
 let
   cfg = config.services.lldap.settings;
   fqdn = "users.systemlos.org";
@@ -11,8 +11,15 @@ in {
       http_url = "https://${fqdn}";
       ldap_host = "127.0.0.1";
       ldap_base_dn = "dc=systemlos,dc=com";
+      database_url = "postgres:///lldap";
     };
   };
+
+  services.postgresql.ensureUsers = lib.singleton {
+    name = "lldap";
+    ensureDBOwnership = true;
+  };
+  services.postgresql.ensureDatabases = ["lldap"];
 
   services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;
