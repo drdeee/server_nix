@@ -4,5 +4,6 @@
     ./metrics.nix
     ./ldap.nix
     ./postgresql.nix
+    # ./mail.nix
   ];
 }
