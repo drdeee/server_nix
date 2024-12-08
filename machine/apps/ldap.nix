@@ -19,6 +19,10 @@ in {
     };
   };
 
+  systemd.services.lldap.postStart = ''
+
+  '';
+
   services.postgresql.ensureUsers = lib.singleton {
     name = "lldap";
     ensureDBOwnership = true;
