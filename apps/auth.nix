@@ -11,6 +11,8 @@ in {
       bindaddress = "127.0.0.1:8001";
       ldapbindaddress = "127.0.0.1:636";
       db_path = "/var/lib/kanidm/kanidm.db";
+      tls_chain = "/var/lib/acme/${fqdn}/chain.pem";
+      tls_key = "/var/lib/acme/${fqdn}/key.pem";
       online_backup = {
         versions = 3;
         path = "/var/lib/kanidm/backups";
