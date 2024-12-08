@@ -10,7 +10,7 @@ in {
       http_port = 8001;
       http_url = "https://${fqdn}";
       ldap_host = "127.0.0.1";
-      ldap_base_dn = "dc=systemlos,dc=com";
+      ldap_base_dn = "dc=systemlos,dc=org";
       database_url = "postgresql://lldap@/run/postgresql/lldap";
     };
   };
