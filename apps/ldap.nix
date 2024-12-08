@@ -11,7 +11,7 @@ in {
       http_url = "https://${fqdn}";
       ldap_host = "127.0.0.1";
       ldap_base_dn = "dc=systemlos,dc=com";
-      database_url = "postgres:///lldap";
+      database_url = "postgresql://lldap@/run/postgresql/lldap";
     };
   };
 

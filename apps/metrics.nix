@@ -48,6 +48,7 @@ in
       server.http_port = 9001;
       database = {
         type = "postgres";
+	user = "grafana";
         host = "/run/postgresql/";
       };
     };
