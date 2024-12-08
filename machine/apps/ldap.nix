@@ -12,7 +12,7 @@ in {
       http_url = "https://${fqdn}";
       ldap_host = "127.0.0.1";
       ldap_base_dn = "dc=systemlos,dc=org";
-      database_url = "postgresql://lldap:${builtins.readFile sops.secrets."services/lldap/dbPassword".path}@localhost/lldap";
+      database_url = "postgresql:///lldap";
     };
   };
 
