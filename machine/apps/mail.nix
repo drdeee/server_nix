@@ -33,8 +33,26 @@ in {
       config.sops.secrets."services/maddy/ldapPassword".path
     ];
     # dn_template "cn={username},ou=people,dc=${rootDomain},dc=${topDomain}"
-    config = lib.readFile ../config/maddy.conf;
+    config = ''
+      # Authentication
+      auth.ldap local_ldap {
+        urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
+
+        bind plain "cn=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
+        base_dn "${baseDN}"
+
+        starttls off
+        debug off
+        connect_timeout 1m
+      }
+      ${lib.readFile ../config/maddy.conf}
+    '';
   };
+
+  systemd.services.maddy.preStart = ''
+    touch /var/lib/maddy/aliases
+    mkdir -p /var/lib/maddy/storage
+  '';
 
   # TODO mail client
   services.nginx.virtualHosts."${hostname}" = {
