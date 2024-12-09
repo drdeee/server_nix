@@ -39,6 +39,7 @@ in {
         urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
 
         bind plain "cn=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
+        filter "(&(&(objectClass=person)(mail={username}))(memberOf=cn=mail,ou=groups,${baseDN}))"
         base_dn "${baseDN}"
 
         starttls off
