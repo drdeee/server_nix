@@ -1,5 +1,5 @@
 {
-  config, lib, ...
+  config, lib, pkgs, ...
 }:
 let
   lldap = config.services.lldap.settings;
@@ -61,7 +61,7 @@ in {
   services.roundcube = {
     enable = true;
     hostName = "${hostname}";
-    dicts = [ en de ];
+    dicts = with pkgs.aspellDicts; [ en de ];
     database = {
       host = "/run/postgresql";
     };
