@@ -22,12 +22,15 @@ in {
 
     openFirewall = true;
 
-    tls.certificates = [
-      {
-        keyPath = "/var/lib/acme/${hostname}/key.pem";
-        certPath = "/var/lib/acme/${hostname}/cert.pem";
-      }
-    ];
+    tls = {
+      loader = "file";
+      certificates = [
+        {
+          keyPath = "/var/lib/acme/${hostname}/key.pem";
+          certPath = "/var/lib/acme/${hostname}/cert.pem";
+        }
+      ];
+    };
 
     secrets = [
       config.sops.secrets."services/maddy/ldapPassword".path
