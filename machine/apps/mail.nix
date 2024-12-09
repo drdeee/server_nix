@@ -57,13 +57,6 @@ in {
   security.acme.certs."${hostname}".group = config.services.maddy.group;
   users.users.nginx.extraGroups = ["${config.services.maddy.group}"];
 
-
-  services.postgresql.ensureDatabases = ["maddy"];
-  services.postgresql.ensureUsers = lib.singleton {
-    name = "maddy";
-    ensureDBOwnership = true;
-  };
-
   # roundcube
   services.roundcube = {
     enable = true;
@@ -80,10 +73,16 @@ in {
     forceSSL = true;
   };
 
-  services.postgresql.ensureDatabases = ["roundcube"];
-  services.postgresql.ensureUsers = lib.singleton {
-    name = "roundcube";
-    ensureDBOwnership = true;
-  }
-
+  # ensure databases
+  services.postgresql.ensureDatabases = ["maddy" "roundcube"];
+  services.postgresql.ensureUsers = [
+    {
+      name = "maddy";
+      ensureDBOwnership = true;
+    }
+    {
+      name = "roundcube";
+      ensureDBOwnership = true;
+    }
+  ];
 }
