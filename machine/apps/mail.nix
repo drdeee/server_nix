@@ -67,6 +67,10 @@ in {
     hostName = "${hostname}";
     dicts = with pkgs.aspellDicts; [ en de ];
     configureNginx = true;
+    extraConfig = ''
+      $config['smtp_host'] = "127.0.0.1:586";
+      $config['imap_host'] = "127.0.0.1:143";
+    '';
   };
 
   services.nginx.virtualHosts."${hostname}" = {
