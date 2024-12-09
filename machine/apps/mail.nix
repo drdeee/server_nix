@@ -175,6 +175,8 @@ in {
     '';
   };
 
+  networking.firewall.allowedTCPPorts = [ 143 993 465 587 ];
+
   # TODO mail client
   services.nginx.virtualHosts."${hostname}" = {
     globalRedirect = "https://aktivistisch.de";
