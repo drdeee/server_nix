@@ -62,9 +62,6 @@ in {
     enable = true;
     hostName = "${hostname}";
     dicts = with pkgs.aspellDicts; [ en de ];
-    database = {
-      host = "/run/postgresql";
-    };
     configureNginx = true;
   };
 
