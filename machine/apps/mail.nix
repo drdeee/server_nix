@@ -41,9 +41,7 @@ in {
       auth.ldap local_ldap {
         urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
 
-        bind plain "uid=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
-        filter "(&(&(objectClass=person)(mail={username}))(memberOf=uid=mail,ou=groups,${baseDN}))"
-        base_dn "${baseDN}"
+        dn_template "uid={username},ou=people,${baseDN}"
 
         starttls off
         debug on
