@@ -185,6 +185,8 @@ in {
   };
 
   security.acme.certs."${hostname}".group = config.services.maddy.group;
+  users.users.nginx.extraGroups = ["${config.services.maddy.group}"];
+
 
   services.postgresql.ensureDatabases = ["maddy"];
   services.postgresql.ensureUsers = lib.singleton {
