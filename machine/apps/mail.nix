@@ -7,19 +7,33 @@ let
   primaryDomain = "systemlos.org";
   baseDN = "dc=systemlos,dc=org";
 in {
+  sops.secrets."services/maddy/ldapPassword" = {
+    owner = "maddy";
+  };
+
   services.maddy = {
     enable = true;
     user = "maddy";
     group = "maddy";
+
+    hostname = "${hostname}";
     primaryDomain = "${primaryDomain}";
+    localDomains = ["${primaryDomain}"];
+
+    openFirewall = true;
+
+    tls.certificates = [
+      {
+        keyPath = "/var/lib/acme/${hostname}/key.pem";
+        certPath = "/var/lib/acme/${hostname}/cert.pem";
+      }
+    ];
+
+    secrets = [
+      config.sops.secrets."services/maddy/ldapPassword".path
+    ];
     # dn_template "cn={username},ou=people,dc=${rootDomain},dc=${topDomain}"
     config = ''
-      # Base variables
-      $(hostname) = ${hostname}
-      $(primary_domain) = ${primaryDomain}
-      $(local_domains) = $(primary_domain)
-      tls file /var/lib/acme/$(hostname)/cert.pem /var/lib/acme/$(hostname)}/key.pem
-
       # Storage
       storage.imapsql local_mailboxes {
         driver postgres
@@ -31,7 +45,7 @@ in {
       auth.ldap local_ldap {
         urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
 
-        bind plain "cn=system,ou=people,${baseDN}" "{env:MADDY_LDAP_PASSWORD}"
+        bind plain "cn=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
         base_dn "${baseDN}"
 
         starttls off
@@ -40,8 +54,6 @@ in {
       }
 
       # SMTP endpoints
-      hostname $(hostname)
-
       table.chain local_rewrites {
         optional_step regexp "(.+)\+(.+)@(.+)" "$1@$3"
         optional_step static {
@@ -174,8 +186,6 @@ in {
       openmetrics tcp://127.0.0.1:9749 { }
     '';
   };
-
-  networking.firewall.allowedTCPPorts = [ 143 993 465 587 ];
 
   # TODO mail client
   services.nginx.virtualHosts."${hostname}" = {
