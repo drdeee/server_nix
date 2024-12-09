@@ -41,12 +41,12 @@ in {
       auth.ldap local_ldap {
         urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
 
-        bind plain "cn=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
-        filter "(&(&(objectClass=person)(mail={username}))(memberOf=cn=mail,ou=groups,${baseDN}))"
+        bind plain "uid=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
+        filter "(&(&(objectClass=person)(mail={username}))(memberOf=uid=mail,ou=groups,${baseDN}))"
         base_dn "${baseDN}"
 
         starttls off
-        debug off
+        debug on
         connect_timeout 1m
       }
       ${lib.readFile ../config/maddy.conf}
