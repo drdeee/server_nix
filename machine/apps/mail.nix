@@ -54,13 +54,6 @@ in {
     mkdir -p /var/lib/maddy/storage
   '';
 
-  # TODO mail client
-  services.nginx.virtualHosts."${hostname}" = {
-    globalRedirect = "https://aktivistisch.de";
-    enableACME = true;
-    forceSSL = true;
-  };
-
   security.acme.certs."${hostname}".group = config.services.maddy.group;
   users.users.nginx.extraGroups = ["${config.services.maddy.group}"];
 
@@ -70,4 +63,27 @@ in {
     name = "maddy";
     ensureDBOwnership = true;
   };
+
+  # roundcube
+  services.roundcube = {
+    enable = true;
+    hostName = "${hostname}";
+    dicts = [ en de ];
+    database = {
+      host = "/run/postgresql";
+    };
+    configureNginx = true;
+  };
+
+  services.nginx.virtualHosts."${hostname}" = {
+    enableACME = true;
+    forceSSL = true;
+  };
+
+  services.postgresql.ensureDatabases = ["roundcube"];
+  services.postgresql.ensureUsers = lib.singleton {
+    name = "roundcube";
+    ensureDBOwnership = true;
+  }
+
 }
