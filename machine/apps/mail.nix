@@ -4,27 +4,30 @@
 let
   lldap = config.services.lldap.settings;
   primaryDomain = "systemlos.org";
-  rootDomain = "systemlos";
-  topDomain = "org";
-
+  baseDN = "dc=systemlos,dc=org";
 in {
   services.maddy = {
     enable = true;
     user = "maddy";
     group = "maddy";
     primaryDomain = "${primaryDomain}";
+    # dn_template "cn={username},ou=people,dc=${rootDomain},dc=${topDomain}"
     config = ''
-      auth.ldap {
+      auth.ldap ldap {
         urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
-        bind off
-        dn_template "cn={username},ou=people,dc=${rootDomain},dc=${topDomain}"
-        base_dn "ou=people,dc=${rootDomain},dc=${topDomain}"
+
+        bind plain "cn=system,ou=people,${baseDN}" "{env:MADDY_LDAP_PASSWORD}"
+        base_dn "${baseDN}"
+
+        starttls off
+        debug off
+        connect_timeout 1m
       }
     '';
   };
 
   services.postgresql.ensureDatabases = ["maddy"];
-  services.psotgresql.ensureUsers = lib.singleton {
+  services.postgresql.ensureUsers = lib.singleton {
     name = "maddy";
     ensureDBOwnership = true;
   };
