@@ -37,6 +37,14 @@ in
           }
         ];
       }
+      {
+        job_name = "maddy";
+        static_configs = [
+          {
+            targets = ["localhost:9749"];
+          }
+        ];
+      }
     ];
   };
 
