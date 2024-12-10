@@ -9,10 +9,7 @@
     })
   ];
 
-  sops.secrets."services/mail/adminPassword" = {
-    owner = config.systemd.services.lldap.serviceConfig.User;
-    key = "services/ldap/adminPassword";
-  };
+  sops.secrets."services/mail/ldapPassword" = {};
 
   mailserver = {
     enable = true;
@@ -24,7 +21,7 @@
       uris = ["ldap://127.0.0.1:3890"];
       searchBase = "ou=people,dc=systemlos,dc=org";
       bind.dn = "uid=system,ou=people,dc=systemlos,dc=org";
-      bind.passwordFile = config.sops.secrets."services/mail/adminPassword".path;
+      bind.passwordFile = config.sops.secrets."services/mail/ldapPassword".path;
     };
 
     # Use Let's Encrypt certificates. Note that this needs to set up a stripped
