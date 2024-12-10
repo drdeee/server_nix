@@ -12,6 +12,8 @@ in {
       passwordFile = config.sops.secrets."services/keycloak/databasePassword".path;
     };
 
+    initialAdminPassword = "changeNow!!!11!";
+
     settings = {
       hostname = fqdn;
       http-relative-path = "/";
