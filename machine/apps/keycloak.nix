@@ -1,13 +1,15 @@
 {config, ...}: let
   fqdn = "auth.systemlos.org";
 in {
+  sops.secrets."services/keycloak/databasePassword" = {};
+
   services.keycloak = {
     enable = true;
 
     database = {
       type = "postgresql";
       createLocally = true;
-      host = "/run/postgresql";
+      passwordFile = config.sops.secrets."services/keycloak/databasePassword".path;
     };
 
     settings = {
