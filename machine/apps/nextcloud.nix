@@ -1,5 +1,9 @@
 {pkgs, config, ...}:
 {
+  environment.systemPackages =with pkgs; [
+    nextcloud30
+  ];
+
   sops.secrets."services/nextcloud/adminPassword" = {};
   services.nextcloud = {
     enable = true;
