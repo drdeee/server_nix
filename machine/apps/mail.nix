@@ -1,4 +1,7 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }: let
+  fqdn = "mail.systemlos.org";
+  domainList = [ "systemlos.org" ];
+in {
   imports = [
     (builtins.fetchTarball {
       # Pick a release version you are interested in and set its hash, e.g.
@@ -13,8 +16,8 @@
 
   mailserver = {
     enable = true;
-    fqdn = "mail.systemlos.org";
-    domains = [ "systemlos.org" ];
+    fqdn = "${fqdn}";
+    domains = domainList;
 
     ldap = {
       enable = true;
@@ -26,8 +29,19 @@
     certificateScheme = "acme";
   };
 
-  services.nginx.virtualHosts."mail.systemlos.org" = {
-    forceSSL = true;
-    enableACME = true;
+  # roundcube
+  services.roundcube = {
+    enable = true;
+    hostName = fqdn;
+    dicts = with pkgs.aspellDicts; [ en de ];
+    configureNginx = true;
   };
+
+  services.postgresql.ensureDatabases = ["roundcube"];
+  services.postgresql.ensureUsers = [
+    {
+      name = "roundcube";
+      ensureDBOwnership = true;
+    }
+  ];
 }
