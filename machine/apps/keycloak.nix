@@ -1,10 +1,12 @@
-{config, ...}: let
-  fqdn = "auth.systemlos.org";
+{config, pkgs, ...}: let
+  fqdn = "auth0.systemlos.org";
 in {
   sops.secrets."services/keycloak/databasePassword" = {};
 
   services.keycloak = {
     enable = true;
+
+    package = pkgs.keycloak;
 
     database = {
       type = "postgresql";
