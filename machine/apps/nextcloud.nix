@@ -1,19 +1,34 @@
 {pkgs, config, ...}:
 {
-  environment.systemPackages =with pkgs; [
-    nextcloud30
-  ];
 
-  sops.secrets."services/nextcloud/adminPassword" = {};
+  sops.secrets."services/nextcloud/adminPassword" = {
+    owner = "nextcloud";
+  };
+
   services.nextcloud = {
     enable = true;
     hostName = "cloud.systemlos.org";
+
     package = pkgs.nextcloud30;
 
-    config.adminpassFile = config.sops.secrets."services/nextcloud/adminPassword".path;
+    database.createLocally = true;
+    configureRedis = true;
 
-    extraApps = {
-      inherit (config.services.nextcloud.package.packages.apps) news contacts calendar tasks;
+    maxUploadSize = "16G";
+    https = true;
+
+    config = {
+      dbtype = "pgsql";
+      adminpassFile = config.sops.secrets."services/nextcloud/adminPassword".path;
     };
+
+    # extraApps = {
+    #   inherit (config.services.nextcloud.package.packages.apps) news contacts calendar tasks;
+    # };
+  };
+
+  services.nginx.virtualHosts."cloud.systemlos.org" = {
+    forceSSL = true;
+    enableACME = true;
   };
 }
