@@ -17,13 +17,15 @@ in {
     initialAdminPassword = "changeNow!!!11!";
 
     settings = {
-      hostname = fqdn;
+      hostname = "https://${fqdn}";
+      proxy-headers = "xforwarded";
       http-relative-path = "/";
       http-port = 38080;
       http-host = "127.0.0.1";
       http-enabled = true;
     };
   };
+
   services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;
     enableACME = true;
