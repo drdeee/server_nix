@@ -1,93 +1,35 @@
-{
-  config, lib, pkgs, ...
-}:
-let
-  lldap = config.services.lldap.settings;
-  hostname = "mail.systemlos.org";
-  primaryDomain = "systemlos.org";
-  baseDN = "dc=systemlos,dc=org";
-in {
-  sops.secrets."services/maddy/ldapPassword" = {
-    owner = "maddy";
+{ config, pkgs, ... }: {
+  imports = [
+    (builtins.fetchTarball {
+      # Pick a release version you are interested in and set its hash, e.g.
+      url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/nixos-23.05/nixos-mailserver-nixos-23.05.tar.gz";
+      # To get the sha256 of the nixos-mailserver tarball, we can use the nix-prefetch-url command:
+      # release="nixos-23.05"; nix-prefetch-url "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/${release}/nixos-mailserver-${release}.tar.gz" --unpack
+      sha256 = "0000000000000000000000000000000000000000000000000000";
+    })
+  ];
+
+  sops.secrets."services/mail/adminPassword" = {
+    owner = config.systemd.services.lldap.serviceConfig.User;
+    key = "services/ldap/adminPassword";
   };
 
-  services.maddy = {
+  mailserver = {
     enable = true;
-    user = "maddy";
-    group = "maddy";
+    fqdn = "mail.systemlos.org";
+    domains = [ "systemlos.org" ];
 
-    hostname = "${hostname}";
-    primaryDomain = "${primaryDomain}";
-    localDomains = ["${primaryDomain}"];
-
-    openFirewall = true;
-
-    tls = {
-      loader = "file";
-      certificates = [
-        {
-          keyPath = "/var/lib/acme/${hostname}/key.pem";
-          certPath = "/var/lib/acme/${hostname}/cert.pem";
-        }
-      ];
+    ldap = {
+      enable = true;
+      uris = ["ldap://127.0.0.1:3890"];
+      searchBase = "ou=people,dc=systemlos,dc=org";
+      bind.dn = "uid=system,ou=people,dc=systemlos,dc=org";
+      bind.passwordFile = config.sops.secrets."services/mail/adminPassword".path;
     };
 
-    secrets = [
-      config.sops.secrets."services/maddy/ldapPassword".path
-    ];
-    # dn_template "cn={username},ou=people,dc=${rootDomain},dc=${topDomain}"
-    config = ''
-      # Authentication
-      auth.ldap local_ldap {
-        urls ldap://${lldap.ldap_host}:${toString lldap.ldap_port}
-
-        bind plain "uid=system,ou=people,${baseDN}" "{env:LDAP_PASSWORD}"
-        filter "(&(&(objectClass=person)(mail={username}))(memberOf=uid=mail,ou=groups,${baseDN}))"
-        base_dn "${baseDN}"
-
-        starttls off
-        debug on
-        connect_timeout 1m
-      }
-      ${lib.readFile ../config/maddy.conf}
-    '';
+    # Use Let's Encrypt certificates. Note that this needs to set up a stripped
+    # down nginx and opens port 80.
+    certificateScheme = "acme-nginx";
   };
 
-  systemd.services.maddy.preStart = ''
-    touch /var/lib/maddy/aliases
-    mkdir -p /var/lib/maddy/storage
-  '';
-
-  security.acme.certs."${hostname}".group = config.services.maddy.group;
-  users.users.nginx.extraGroups = ["${config.services.maddy.group}"];
-
-  # roundcube
-  services.roundcube = {
-    enable = true;
-    hostName = "${hostname}";
-    dicts = with pkgs.aspellDicts; [ en de ];
-    configureNginx = true;
-    extraConfig = ''
-      $config['smtp_host'] = "127.0.0.1:586";
-      $config['imap_host'] = "127.0.0.1:143";
-    '';
-  };
-
-  services.nginx.virtualHosts."${hostname}" = {
-    enableACME = true;
-    forceSSL = true;
-  };
-
-  # ensure databases
-  services.postgresql.ensureDatabases = ["maddy" "roundcube"];
-  services.postgresql.ensureUsers = [
-    {
-      name = "maddy";
-      ensureDBOwnership = true;
-    }
-    {
-      name = "roundcube";
-      ensureDBOwnership = true;
-    }
-  ];
 }
