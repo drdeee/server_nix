@@ -26,7 +26,9 @@ in {
       bind.dn = "uid=system,ou=people,dc=systemlos,dc=org";
       bind.passwordFile = config.sops.secrets."services/mail/ldapPassword".path;
     };
-    certificateScheme = "acme";
+    certificateScheme = "manual";
+    certificateFile = "/var/lib/acme/${fqdn}/cert.pem";
+    keyFile = "/var/lib/acme/${fqdn}/key.pem";
   };
 
   # roundcube
