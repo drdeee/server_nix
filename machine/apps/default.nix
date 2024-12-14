@@ -5,5 +5,7 @@
     ./ldap.nix
     ./postgresql.nix
     ./mail.nix
+    ./nextcloud.nix
+    ./keycloak.nix
   ];
 }

@@ -3,6 +3,10 @@ let
 in {
   services.nginx = {
     enable = true;
+    recommendedProxySettings = true;
+    recommendedOptimisation = true;
+    recommendedGzipSettings = true;
+    recommendedBrotliSettings = true;
   };
 
   security.acme = {
