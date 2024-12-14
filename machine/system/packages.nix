@@ -13,4 +13,6 @@
       credential.helper = "store";
     };
   };
+
+  virtualisation.docker.enable = true;
 }
