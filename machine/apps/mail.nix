@@ -25,12 +25,6 @@ in {
       searchBase = "ou=people,dc=systemlos,dc=org";
       bind.dn = "uid=system,ou=people,dc=systemlos,dc=org";
       bind.passwordFile = config.sops.secrets."services/mail/ldapPassword".path;
-
-      dovecot.passFilter = "(&(memberOf=cn=mail,ou=groups,dc=systemlos,dc=org)(uid=%u))";
-      postfix = {
-        filter = "(&(memberOf=cn=mail,ou=groups,dc=systemlos,dc=org)(uid=%s))";
-        uidAttribute = "uid";
-      };
     };
     certificateScheme = "manual";
     certificateFile = "/var/lib/acme/${fqdn}/cert.pem";
