@@ -4,7 +4,7 @@
     ./metrics.nix
     ./ldap.nix
     ./postgresql.nix
-    # ./mail.nix
+    ./mail.nix
     ./nextcloud.nix
     ./keycloak.nix
   ];

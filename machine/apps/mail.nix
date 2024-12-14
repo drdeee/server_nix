@@ -35,6 +35,12 @@ in {
     hostName = fqdn;
     dicts = with pkgs.aspellDicts; [ en de ];
     configureNginx = true;
+    extraConfig = ''
+      $config['smtp_server'] = 'ssl://mail.systemlos.org';
+      $config['smtp_port'] = 465;
+      $config['smtp_user'] = '%u';
+      $config['smtp_pass'] = '%p';
+    '';
   };
 
   services.postgresql.ensureDatabases = ["roundcube"];
