@@ -26,7 +26,7 @@ in {
       bind.dn = "uid=system,ou=people,dc=systemlos,dc=org";
       bind.passwordFile = config.sops.secrets."services/mail/ldapPassword".path;
 
-      dovecot.userFilter = "(&(memberOf=cn=mail,ou=groups,dc=systemlos,dc=org)(mail=%u))";
+      dovecot.userFilter = "(&(&(memberOf=cn=mail,ou=groups,dc=systemlos,dc=org)(!(memberOf=cn=sendonly,ou=groups,dc=systemlos,dc=org)))(mail=%u))";
       postfix.filter = "(&(memberOf=cn=mail,ou=groups,dc=systemlos,dc=org)(mail=%s))";
     };
 

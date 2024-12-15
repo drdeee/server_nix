@@ -4,6 +4,8 @@
   environment.systemPackages =with pkgs; [
     htop
     sops
+    jq
+    jo
   ];
 
   programs.git = {
@@ -14,5 +16,13 @@
     };
   };
 
-  virtualisation.docker.enable = true;
+  virtualisation.oci-containers.backend = "podman";
+  virtualisation.podman = {
+    enable = true;
+    autoPrune.enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+
+  networking.firewall.interfaces."podman+".allowedUDPPorts = [ 53 ];
 }

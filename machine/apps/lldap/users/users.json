@@ -1,0 +1,7 @@
+[
+  {
+    "id": "vaultwarden",
+    "email": "vaultwarden@systemlos.org",
+    "groups": ["mail", "sendonly"]
+  }
+]
