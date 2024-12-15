@@ -32,6 +32,11 @@ in {
     owner = config.systemd.services.lldap.serviceConfig.User;
   };
 
+  sops.secrets."noreplyPassword/lldap" = {
+    owner = config.systemd.services.lldap.serviceConfig.User;
+    key = "noreplyPassword";
+  };
+
   environment.systemPackages = with pkgs; [
     jq
     jo
@@ -51,6 +56,7 @@ in {
   };
 
   systemd.services.lldap-bootstrap = {
+    enable = true;
     script = ''
       LLDAP_URL="http://${cfg.http_host}:${toString cfg.http_port}"
       LLDAP_ADMIN_USERNAME="${cfg.ldap_user_dn}"
@@ -60,8 +66,8 @@ in {
 
       lldap_set_password -b $LLDAP_URL --admin-username LLDAP_ADMIN_USERNAME \
         --admin-password $LLDAP_ADMIN_PASSWORD
-        -u vaultwarden
-        -p $(<${config.sops.secrets."services/lldap/adminPassword".path})
+        -u noreply
+        -p $(<${config.sops.secrets."noreplyPassword/lldap".path})
     '';
     after = [ "lldap.service" ];
     serviceConfig.User = "lldap";

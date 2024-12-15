@@ -484,11 +484,6 @@ main() {
     exit 1
   fi
 
-  until curl --silent -o /dev/null "$LLDAP_URL"; do
-    printf 'Waiting lldap to start...\n'
-    sleep 10
-  done
-
   auth "$LLDAP_URL" "$LLDAP_ADMIN_USERNAME" "$LLDAP_ADMIN_PASSWORD"
 
   printf -- '\n--- group schemas ---\n'
