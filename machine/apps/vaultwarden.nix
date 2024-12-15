@@ -1,15 +1,54 @@
+{config, lib, pkgs, ...}:
 let
   fqdn = "vault.systemlos.org";
   port = 11001;
 in {
+
+  sops.secrets."noreplyPassword/vaultwarden" = {
+    key = "noreplyPassword";
+  };
+
+  sops.secrets."services/vaultwarden/adminToken" = {};
+  sops.secrets."services/vaultwarden/bwInstallId" = {};
+  sops.secrets."services/vaultwarden/bwInstallKey" = {};
+
+  users.users.vaultwarden = {
+    isSystemUser = true;
+    linger = true;
+    group = "vaultwarden";
+  };
+
+  users.groups.vaultwarden = {};
+
   virtualisation.oci-containers.containers.vaultwarden = {
     image = "vaultwarden/server:latest";
+    user = "${config.users.users.vaultwarden.uid}:${config.users.users.vaultwarden.gid}";
     environment = {
-      "DOMAIN" = "https://${fqdn}";
-      "SIGNUPS_ALLOWED" = false;
+      DOMAIN = "https://${fqdn}";
+      SIGNUPS_ALLOWED = "false";
+      SMTP_FROM = "readonly@systemlos.org";
+      SMTP_HOST = "mail.systemlos.org";
+      SMTP_USERNAME = "noreply@systemlos.org";
+      SMTP_PASSWORD_FILE = "/mailPassword";
+      ADMIN_TOKEN_FILE = "/adminToken";
+
+      PUSH_ENABLED = "true";
+      PUSH_INSTALLATION_ID_FILE = "/bwInstallId";
+      PUSH_INSTALLATION_KEY_FILE = "/bwInstallKey";
+      PUSH_RELAY_URI = "https://api.bitwarden.eu";
+      PUSH_IDENTITY_URI = "https://identity.bitwarden.eu";
+
+      DATABASE_URL= "postgresql:///vaultwarden";
+
+      SHOW_PASSWORD_HINT = "false";
     };
     volumes = [
       "/var/lib/vaultwarden:/data:rw"
+      "${config.sops.secrets."noreplyPassword/vaultwarden".path}:/mailPassword:ro"
+      "${config.sops.secrets."services/vaultwarden/adminToken".path}:/adminToken:ro"
+      "${config.sops.secrets."services/vaultwarden/bwInstallId".path}:/bwInstallId:ro"
+      "${config.sops.secrets."services/vaultwarden/bwInstallKey".path}:/bwInstallKey:ro"
+      "/run/postgresql:/run/postgresql"
     ];
     ports = [
       "${toString port}:80/tcp"
@@ -21,7 +60,16 @@ in {
     ];
   };
 
+    services.postgresql.ensureUsers = lib.singleton {
+    name = "vaultwarden";
+    ensureDBOwnership = true;
+  };
+  services.postgresql.ensureDatabases = ["vaultwarden"];
+
   systemd.services.podman-vaultwarden = {
+    preStart = ''
+      mkdir -p /var/lib/vaultwarden
+    '';
     serviceConfig = {
       Restart = lib.mkOverride 90 "always";
     };
