@@ -2,7 +2,7 @@
   imports = [
     ./nginx.nix
     ./metrics.nix
-    ./lldap
+    ./lldap.nix
     ./postgresql.nix
     ./mail.nix
     # ./nextcloud.nix

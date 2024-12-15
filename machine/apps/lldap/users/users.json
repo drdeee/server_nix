@@ -1,7 +1,0 @@
-[
-  {
-    "id": "noreply",
-    "email": "noreply",
-    "groups": ["mail", "sendonly"]
-  }
-]

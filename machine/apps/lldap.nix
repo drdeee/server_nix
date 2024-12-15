@@ -1,13 +1,9 @@
-{config, lib, pkgs, ...}:
+{config, lib, ...}:
 let
   cfg = config.services.lldap.settings;
   fqdn = "users.systemlos.org";
   rootDomain = "systemlos";
   topDomain = "org";
-
-  bootstrapScript = pkgs.writeScriptBin "bootstrap.sh" ''
-    ${builtins.readFile "/etc/nixos/machine/apps/lldap/bootstrap.sh"}
-  '';
 in {
 
   services.lldap = {
@@ -32,17 +28,6 @@ in {
     owner = config.systemd.services.lldap.serviceConfig.User;
   };
 
-  sops.secrets."noreplyPassword/lldap" = {
-    owner = config.systemd.services.lldap.serviceConfig.User;
-    key = "noreplyPassword";
-  };
-
-  environment.systemPackages = with pkgs; [
-    jq
-    jo
-    lldap
-  ];
-
   users.users.lldap = {
     isSystemUser = true;
     linger = true;
@@ -52,24 +37,6 @@ in {
   users.groups.lldap = {};
 
   systemd.services.lldap = {
-    serviceConfig.User = "lldap";
-  };
-
-  systemd.services.lldap-bootstrap = {
-    enable = true;
-    script = ''
-      LLDAP_URL="http://${cfg.http_host}:${toString cfg.http_port}"
-      LLDAP_ADMIN_USERNAME="${cfg.ldap_user_dn}"
-      LLDAP_ADMIN_PASSWORD=$(<${config.sops.secrets."services/lldap/adminPassword".path})
-      PATH=$PATH:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.jo}/bin:${pkgs.lldap}/bin
-      ${bootstrapScript}/bin/bootstrap.sh
-
-      lldap_set_password -b $LLDAP_URL --admin-username LLDAP_ADMIN_USERNAME \
-        --admin-password $LLDAP_ADMIN_PASSWORD
-        -u noreply
-        -p $(<${config.sops.secrets."noreplyPassword/lldap".path})
-    '';
-    after = [ "lldap.service" ];
     serviceConfig.User = "lldap";
   };
 
