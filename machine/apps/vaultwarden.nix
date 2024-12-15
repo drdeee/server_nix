@@ -31,7 +31,7 @@ in {
 
       DOMAIN = "https://${fqdn}";
       SIGNUPS_ALLOWED = "false";
-      SMTP_FROM = "readonly@systemlos.org";
+      SMTP_FROM = "noreply@systemlos.org";
       SMTP_HOST = "mail.systemlos.org";
       SMTP_USERNAME = "noreply@systemlos.org";
       SMTP_PASSWORD_FILE = config.sops.secrets."noreplyPassword/vaultwarden".path;
