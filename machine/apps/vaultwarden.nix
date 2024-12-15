@@ -9,9 +9,6 @@ in {
     owner = "vaultwarden";
   };
 
-  sops.secrets."services/vaultwarden/adminToken" = {
-    owner = "vaultwarden";
-  };
   sops.secrets."services/vaultwarden/bwInstallId" = {
     owner = "vaultwarden";
   };
@@ -35,8 +32,6 @@ in {
       SMTP_HOST = "mail.systemlos.org";
       SMTP_USERNAME = "noreply@systemlos.org";
       SMTP_PASSWORD_FILE = config.sops.secrets."noreplyPassword/vaultwarden".path;
-
-      ADMIN_TOKEN_FILE = config.sops.secrets."services/vaultwarden/adminToken".path;
 
       PUSH_ENABLED = "true";
       PUSH_INSTALLATION_ID_FILE = config.sops.secrets."services/vaultwarden/bwInstallId".path;
