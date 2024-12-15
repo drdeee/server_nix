@@ -16,13 +16,9 @@
     };
   };
 
-  virtualisation.oci-containers.backend = "podman";
-  virtualisation.podman = {
+  virtualisation.oci-containers.backend = "docker";
+  virtualisation.docker = {
     enable = true;
     autoPrune.enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
   };
-
-  networking.firewall.interfaces."podman+".allowedUDPPorts = [ 53 ];
 }
