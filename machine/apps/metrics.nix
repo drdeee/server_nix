@@ -60,6 +60,13 @@ in
         host = "/run/postgresql/";
       };
     };
+    provision.datasources.settings.datasources = [
+      {
+        name = "Prometheus";
+        url = "http://127.0.0.1:${toString config.services.prometheus.port}";
+        type = "prometheus";
+      }
+    ];
   };
 
   services.postgresql.ensureUsers = lib.singleton {
