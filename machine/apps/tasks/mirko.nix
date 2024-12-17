@@ -28,6 +28,7 @@ let
     };
   });
 in {
+
   sops.secrets."tasks/mirko-reminders" = {
     owner = "tasks";
   };
@@ -41,6 +42,5 @@ in {
       ];
     };
     startAt = "Thu,Sat *-*-* 06:00:00";
-    wantedBy = ["multi-user.target"];
   };
 }
