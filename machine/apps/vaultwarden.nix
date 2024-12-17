@@ -9,10 +9,7 @@ in {
     owner = "vaultwarden";
   };
 
-  sops.secrets."services/vaultwarden/bwInstallId" = {
-    owner = "vaultwarden";
-  };
-  sops.secrets."services/vaultwarden/bwInstallKey" = {
+  sops.secrets."services/vaultwarden" = {
     owner = "vaultwarden";
   };
 
@@ -34,8 +31,6 @@ in {
       SMTP_PASSWORD_FILE = config.sops.secrets."noreplyPassword/vaultwarden".path;
 
       PUSH_ENABLED = "true";
-      PUSH_INSTALLATION_ID_FILE = config.sops.secrets."services/vaultwarden/bwInstallId".path;
-      PUSH_INSTALLATION_KEY_FILE = config.sops.secrets."services/vaultwarden/bwInstallKey".path;
       PUSH_RELAY_URI = "https://api.bitwarden.eu";
       PUSH_IDENTITY_URI = "https://identity.bitwarden.eu";
 
@@ -43,6 +38,7 @@ in {
 
       SHOW_PASSWORD_HINT = "false";
     };
+    environmentFile = config.sops.secrets."services/vaultwarden".path;
   };
 
   services.postgresql.ensureDatabases = ["vaultwarden"];
