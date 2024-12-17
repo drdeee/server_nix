@@ -1,34 +1,46 @@
-{pkgs, ...}:
+{pkgs, config, ...}:
 let
-  mirkoSrc = builtins.fetchGit {
-    name = "mirko-bot";
-    url = "https://codeberg.org/nicht_eli/mirko.git";
-    ref = "main";
-    rev = "93e2c344eb169f8277d2b891e2c761c1e9058c32";
-  };
-in {
-  environment.systemPackages = with pkgs; [
-    nodejs_22
-    yarn
-  ];
+  mirkoReminders = pkgs.stdenv.mkDerivation (finalAttrs: {
+    pname = "mirko-reminders";
+    version = "1.0.0";
 
-  systemd.timers.mirko-bot = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "Thu,Sat *-*-*06:00:00";
-      Persistent = true;
-      Unit = "mirko-bot.service";
+    src = builtins.fetchGit {
+      name = "mirko-reminders";
+      url = "https://codeberg.org/nicht_eli/mirko.git";
+      rev = "e5fab9db71edfb38b730315b9950cb3aa0802631";
     };
+
+    nativeBuildInputs = [
+      pkgs.nodejs_23
+      pkgs.yarnConfigHook
+      pkgs.yarnInstallHook
+    ];
+
+    installPhase = ''
+      mkdir -p $out/bin
+      cp -r index.js package.json $out/
+      cp -r node_modules $out/node_modules
+    '';
+
+    yarnOfflineCache = pkgs.fetchYarnDeps {
+      yarnLock = finalAttrs.src + "/yarn.lock";
+      hash = "sha256-y8w/jydnJvilCAnQyak5mBe6buu1BJ5ZwLvMh2aPNzU=";
+    };
+  });
+in {
+  sops.secrets."tasks/mirko-reminders" = {
+    owner = "tasks";
   };
 
-  systemd.services.mirko-bot = {
+  systemd.services.mirko-reminders = {
     serviceConfig = {
       User = "tasks";
-
-      WorkingDirectory = mirkoSrc;
-
-      ExecStartPre = "${pkgs.yarn}/bin/yarn install --frozen-lockfile";
-      ExecStart = "${pkgs.yarn}/bin/yarn node ${mirkoSrc}/index.js";
+      ExecStart = "${pkgs.nodejs}/bin/node ${mirkoReminders}/index.js";
+      EnvironmentFile = [
+        config.sops.secrets."tasks/mirko-reminders".path
+      ];
     };
+    startAt = "Thu,Sat *-*-* 06:00:00";
+    wantedBy = ["multi-user.target"];
   };
 }
