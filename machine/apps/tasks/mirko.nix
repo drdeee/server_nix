@@ -7,7 +7,7 @@ let
     src = builtins.fetchGit {
       name = "mirko-reminders";
       url = "https://codeberg.org/nicht_eli/mirko.git";
-      rev = "e5fab9db71edfb38b730315b9950cb3aa0802631";
+      ref = "main";
     };
 
     nativeBuildInputs = [
