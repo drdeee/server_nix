@@ -18,6 +18,10 @@ in
         enable = true;
         port = 9101;
       };
+      nginxlog = {
+        enable = true;
+        port = 9102;
+      };
     };
 
     scrapeConfigs = [
@@ -34,6 +38,14 @@ in
         static_configs = [
           {
             targets = ["localhost:${toString prometheusCfg.exporters.nginx.port}"];
+          }
+        ];
+      }
+      {
+        job_name = "nginxlog";
+        static_configs = [
+          {
+            targets = ["localhost:${toString prometheusCfg.exporters.nginxlog.port}"];
           }
         ];
       }
