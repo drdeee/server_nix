@@ -25,5 +25,5 @@ in {
     };
   };
   config.sops = allBackups.sops;
-  config.service.restic = allBackups.restic;
+  config.services.restic = allBackups.restic;
 }
