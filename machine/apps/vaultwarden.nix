@@ -1,8 +1,9 @@
-{config, lib, pkgs, ...}:
+{ config, lib, pkgs, ... }:
 let
   fqdn = "vault.systemlos.org";
   port = 11001;
-in {
+in
+{
 
   sops.secrets."noreplyPassword/vaultwarden" = {
     key = "noreplyPassword";
@@ -34,14 +35,14 @@ in {
       PUSH_RELAY_URI = "https://api.bitwarden.eu";
       PUSH_IDENTITY_URI = "https://identity.bitwarden.eu";
 
-      DATABASE_URL= "postgresql:///vaultwarden";
+      DATABASE_URL = "postgresql:///vaultwarden";
 
       SHOW_PASSWORD_HINT = "false";
     };
     environmentFile = config.sops.secrets."services/vaultwarden".path;
   };
 
-  services.postgresql.ensureDatabases = ["vaultwarden"];
+  services.postgresql.ensureDatabases = [ "vaultwarden" ];
   services.postgresql.ensureUsers = [
     {
       name = "vaultwarden";
@@ -59,7 +60,7 @@ in {
     };
   };
 
-  backups.vaultwardenDatadir = [
+  backupPaths = [
     "/var/lib/vaultwarden"
   ];
 }

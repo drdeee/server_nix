@@ -1,6 +1,7 @@
 let
   backupLocation = "/var/backup/postgresql";
-in {
+in
+{
   services.postgresql = {
     enable = true;
   };
@@ -12,7 +13,7 @@ in {
     startAt = "*-*-* 3:30:00";
   };
 
-  backups.postgresql = [
+  backupPaths = [
     backupLocation
   ];
 }

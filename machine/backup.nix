@@ -15,11 +15,11 @@ let
     pruneOpts = pruneOpts;
     timerConfig = null;
   };
+
   runAfterLocal = {
     wantedBy = [ serviceName ];
     after = [ serviceName ];
   };
-
 in
 {
   options = {

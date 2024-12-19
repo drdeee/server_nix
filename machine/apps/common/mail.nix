@@ -1,8 +1,10 @@
-{ config, pkgs, ... }: let
+{ config, pkgs, ... }:
+let
   fqdn = "mail.systemlos.org";
   domainList = [ "systemlos.org" ];
   backupLocation = "/var/backup/mail";
-in {
+in
+{
   imports = [
     (builtins.fetchTarball {
       # Pick a release version you are interested in and set its hash, e.g.
@@ -13,7 +15,7 @@ in {
     })
   ];
 
-  sops.secrets."services/mail/ldapPassword" = {};
+  sops.secrets."services/mail/ldapPassword" = { };
 
   mailserver = {
     enable = true;
@@ -22,7 +24,7 @@ in {
 
     ldap = {
       enable = true;
-      uris = ["ldap://127.0.0.1:3890"];
+      uris = [ "ldap://127.0.0.1:3890" ];
       searchBase = "ou=people,dc=systemlos,dc=org";
       bind.dn = "uid=system,ou=people,dc=systemlos,dc=org";
       bind.passwordFile = config.sops.secrets."services/mail/ldapPassword".path;
@@ -41,7 +43,7 @@ in {
     };
   };
 
-  backups.mail = [
+  backupPaths = [
     backupLocation
   ];
 
@@ -59,7 +61,7 @@ in {
     '';
   };
 
-  services.postgresql.ensureDatabases = ["roundcube"];
+  services.postgresql.ensureDatabases = [ "roundcube" ];
   services.postgresql.ensureUsers = [
     {
       name = "roundcube";
