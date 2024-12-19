@@ -1,6 +1,12 @@
 {config, lib, pkgs, ...}:
 let
   remoteBase = "ebackup/server";
+  mirrorBase = "SanDisk-Extreme55AE-01/systemlos";
+  pruneOpts = [
+    "--keep-daily 3"
+    "--keep-weekly 5"
+  ];
+
   generateBackupConfig = backupName: backupLocations: {
     sops.secrets."restic/rclone" = {};
     sops.secrets."restic/passwords/${backupName}" = {};
@@ -23,10 +29,18 @@ let
       repository = "rclone:remote:/${remoteBase}/${backupName}";
       rcloneConfigFile = config.sops.secrets."restic/rclone".path;
       passwordFile = config.sops.secrets."restic/passwords/${backupName}".path;
-      pruneOpts = [
-        "--keep-daily 3"
-        "--keep-weekly 5"
-      ];
+      pruneOpts = pruneOpts;
+      timerConfig = null;
+    };
+
+    services.restic.backups."${backupName}-mirror" = {
+      initialize = true;
+      paths = backupLocations;
+      repository = "rclone:mirror:/${mirrorBase}/${backupName}";
+      rcloneConfigFile = config.sops.secrets."restic/rclone".path;
+      passwordFile = config.sops.secrets."restic/passwords/${backupName}".path;
+      pruneOpts = pruneOpts;
+      timerConfig = null;
     };
 
     systemd.services."restic-backups-${backupName}-remote" = {
@@ -35,6 +49,19 @@ let
       ];
       after = [
         config.systemd.services."restic-backups-${backupName}".name
+      ];
+    };
+
+    systemd.services."restic-backups-${backupName}-mirror" = {
+      wantedBy = [
+        config.systemd.services."restic-backups-${backupName}".name
+      ];
+      after = [
+        config.systemd.services."restic-backups-${backupName}".name
+      ];
+      serviceConfig.ExecStart = [
+        "${pkgs.restic}/bin/restic copy --from-repo /var/lib/restic/${backupName} --from-password-file ${config.sops.secrets."restic/passwords/${backupName}".path}"
+        "${pkgs.restic}/bin/restic forget --prune ${lib.concatStringsSep " " pruneOpts}"
       ];
     };
   };
@@ -49,10 +76,6 @@ in {
   };
 
   config = {
-    environment.systemPackages = with pkgs; [
-      restic
-    ];
-
     sops = allBackups.sops;
     systemd = allBackups.systemd;
     services = allBackups.services;
