@@ -1,13 +1,13 @@
 {config, lib, pkgs, ...}:
 let
   generateBackupConfig = backupName: backupLocations: {
-    sops.secrets."restic/${backupName}-password" = {};
+    sops.secrets."restic/passwords/${backupName}" = {};
 
     restic.backups."${backupName}-local" = {
       initialize = true;
       paths = backupLocations;
       repository = "/var/lib/restic/${backupName}";
-      passwordFile = config.sops.secrets."restic/${backupName}-password".path;
+      passwordFile = config.sops.secrets."restic/passwords/${backupName}".path;
       pruneOpts = [
         "--keep-daily 3"
         "--keep-weekly 5"
