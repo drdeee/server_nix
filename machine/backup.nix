@@ -3,7 +3,7 @@ let
   generateBackupConfig = backupName: backupLocations: {
     sops.secrets."restic/${backupName}-password" = {};
 
-    services.restic.backups."${backupName}-local" = {
+    restic.backups."${backupName}-local" = {
       initialize = true;
       paths = backupLocations;
       repository = "/var/lib/restic/${backupName}";
@@ -24,4 +24,6 @@ in {
       type = lib.types.attrsOf (lib.types.listOf lib.types.str);
     };
   };
+  config.sops = allBackups.sops;
+  config.service.restic = allBackups.restic;
 }
