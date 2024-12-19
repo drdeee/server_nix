@@ -5,7 +5,8 @@
 
     ./metrics.nix
     ./vaultwarden.nix
-    # ./nextcloud.nix
+
+    ./nextcloud.nix
     # ./keycloak.nix
   ];
 }

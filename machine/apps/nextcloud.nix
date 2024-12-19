@@ -1,4 +1,4 @@
-{pkgs, config, ...}:
+{ pkgs, config, ... }:
 {
 
   sops.secrets."services/nextcloud/adminPassword" = {
