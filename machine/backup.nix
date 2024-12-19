@@ -24,11 +24,4 @@ in {
       type = lib.types.attrsOf (lib.types.listOf lib.types.str);
     };
   };
-
-  config = lib.attrsets.mergeAttrsList allBackups {
-    environment.packages = with pkgs; [
-      restic
-    ];
-    sops.secrets."restic/rclone" = {};
-  };
 }
