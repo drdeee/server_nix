@@ -8,8 +8,4 @@
 
     ./backup.nix
   ];
-
-  backups.testBackup = [
-    "/var/lib/vaultwarden"
-  ];
 }

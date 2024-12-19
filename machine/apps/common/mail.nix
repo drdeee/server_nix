@@ -1,6 +1,7 @@
 { config, pkgs, ... }: let
   fqdn = "mail.systemlos.org";
   domainList = [ "systemlos.org" ];
+  backupLocation = "/var/backup/mail";
 in {
   imports = [
     (builtins.fetchTarball {
@@ -33,7 +34,16 @@ in {
     certificateScheme = "manual";
     certificateFile = "/var/lib/acme/${fqdn}/cert.pem";
     keyFile = "/var/lib/acme/${fqdn}/key.pem";
+
+    backup = {
+      enable = true;
+      snapshotRoot = backupLocation;
+    };
   };
+
+  backups.mail = [
+    backupLocation
+  ];
 
   # roundcube
   services.roundcube = {

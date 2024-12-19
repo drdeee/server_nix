@@ -58,4 +58,8 @@ in {
       recommendedProxySettings = true;
     };
   };
+
+  backups.vaultwardenDatadir = [
+    "/var/lib/vaultwarden"
+  ];
 }
