@@ -40,6 +40,7 @@ in {
       EnvironmentFile = [
         config.sops.secrets."tasks/mirko-reminders".path
       ];
+      Type = "oneshot";
     };
     startAt = "Thu,Sat *-*-* 06:00:00";
   };
