@@ -8,5 +8,7 @@
 
     ./nextcloud.nix
     # ./keycloak.nix
+
+    ./etherpad.nix
   ];
 }
