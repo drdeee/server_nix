@@ -1,5 +1,12 @@
 { pkgs, config, ... }:
-let backupPath = "/var/lib/nextcloud";
+let
+  backupPath = "/var/lib/nextcloud";
+  fqdn = "cloud.systemlos.org";
+  redirectToNew = {
+    forceSSL = true;
+    enableACME = true;
+    globalRedirect = fqdn;
+  };
 in
 {
 
@@ -9,7 +16,7 @@ in
 
   services.nextcloud = {
     enable = true;
-    hostName = "cloud.systemlos.org";
+    hostName = fqdn;
 
     package = pkgs.nextcloud30;
 
@@ -33,8 +40,10 @@ in
     backupPath
   ];
 
-  services.nginx.virtualHosts."cloud.systemlos.org" = {
+  services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;
     enableACME = true;
   };
+
+  services.nginx.virtualHosts."cloud.aktivistisch.de" = redirectToNew;
 }
