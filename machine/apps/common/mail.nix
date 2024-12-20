@@ -45,6 +45,7 @@ in
 
   backupPaths = [
     backupLocation
+    "/var/dkim"
   ];
 
   # roundcube
