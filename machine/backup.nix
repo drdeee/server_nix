@@ -7,18 +7,13 @@ let
     "--keep-weekly 5"
   ];
 
-  serviceName = config.systemd.services."restic-backups-local".name;
+  remoteName = config.systemd.services."restic-backups-remote".name;
   defaultResticConf = {
     initialize = true;
     paths = config.backupPaths;
     rcloneConfigFile = config.sops.secrets."restic/rclone".path;
     pruneOpts = pruneOpts;
     timerConfig = null;
-  };
-
-  runAfterLocal = {
-    wantedBy = [ serviceName ];
-    after = [ serviceName ];
   };
 in
 {
@@ -30,19 +25,13 @@ in
 
   config = {
     sops.secrets."restic/rclone" = { };
-    sops.secrets."restic/passwords/local" = { };
     sops.secrets."restic/passwords/remote" = { };
     sops.secrets."restic/passwords/mirror" = { };
-
-    services.restic.backups.local = defaultResticConf // {
-      repository = "/var/lib/resticRepo";
-      passwordFile = config.sops.secrets."restic/passwords/local".path;
-      timerConfig.OnCalendar = "*-*-* 4:00:00";
-    };
 
     services.restic.backups.remote = defaultResticConf // {
       repository = "rclone:remote:/${remoteBase}";
       passwordFile = config.sops.secrets."restic/passwords/remote".path;
+      timerConfig.OnCalendar = "*-*-* 4:00:00";
     };
 
     services.restic.backups.mirror = defaultResticConf // {
@@ -50,13 +39,11 @@ in
       passwordFile = config.sops.secrets."restic/passwords/mirror".path;
     };
 
-    systemd.services."restic-backups-remote" = runAfterLocal;
-
     systemd.services."restic-backups-mirror" = {
-      wantedBy = runAfterLocal.wantedBy;
-      after = runAfterLocal.after;
+      wantedBy = [ remoteName ];
+      after = [ remoteName ];
       serviceConfig.ExecStart = lib.mkForce [
-        "${pkgs.restic}/bin/restic copy --from-repo /var/lib/resticRepo --from-password-file ${config.sops.secrets."restic/passwords/local".path}"
+        "${pkgs.restic}/bin/restic copy --from-repo rclone:remote:/${remoteBase} --from-password-file ${config.sops.secrets."restic/passwords/remote".path}"
         "${pkgs.restic}/bin/restic forget --prune ${lib.concatStringsSep " " pruneOpts}"
       ];
     };
