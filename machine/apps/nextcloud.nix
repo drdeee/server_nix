@@ -1,4 +1,6 @@
 { pkgs, config, ... }:
+let backupPath = "/var/lib/nextcloud";
+in
 {
 
   sops.secrets."services/nextcloud/adminPassword" = {
@@ -26,6 +28,10 @@
     #   inherit (config.services.nextcloud.package.packages.apps) news contacts calendar tasks;
     # };
   };
+
+  backupPaths = [
+    backupPath
+  ];
 
   services.nginx.virtualHosts."cloud.systemlos.org" = {
     forceSSL = true;
