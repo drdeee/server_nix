@@ -40,6 +40,14 @@ in
     backupPath
   ];
 
+  backups.preScripts = [
+    "nextcloud-occ maintenance:mode --on"
+  ];
+
+  backups.postScripts = [
+    "nextcloud-occ maintenance:mode --off"
+  ];
+
   services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;
     enableACME = true;
