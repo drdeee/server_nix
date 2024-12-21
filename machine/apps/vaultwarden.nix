@@ -60,7 +60,7 @@ in
     };
   };
 
-  backupPaths = [
+  backups.paths = [
     "/var/lib/vaultwarden"
   ];
 }

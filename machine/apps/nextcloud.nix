@@ -36,7 +36,7 @@ in
     # };
   };
 
-  backupPaths = [
+  backups.paths = [
     backupPath
   ];
 

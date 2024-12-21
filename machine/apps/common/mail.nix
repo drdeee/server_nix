@@ -43,7 +43,7 @@ in
     };
   };
 
-  backupPaths = [
+  backups.paths = [
     backupLocation
     "/var/dkim"
   ];

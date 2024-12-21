@@ -13,7 +13,7 @@ in
     startAt = "*-*-* 3:30:00";
   };
 
-  backupPaths = [
+  backups.paths = [
     backupLocation
   ];
 }

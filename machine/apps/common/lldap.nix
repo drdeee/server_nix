@@ -1,10 +1,11 @@
-{config, lib, ...}:
+{ config, lib, ... }:
 let
   cfg = config.services.lldap.settings;
   fqdn = "users.systemlos.org";
   rootDomain = "systemlos";
   topDomain = "org";
-in {
+in
+{
 
   services.lldap = {
     enable = true;
@@ -24,6 +25,10 @@ in {
     };
   };
 
+  backups.paths = [
+    "/var/lib/lldap"
+  ];
+
   sops.secrets."services/lldap/adminPassword" = {
     owner = config.systemd.services.lldap.serviceConfig.User;
   };
@@ -34,7 +39,7 @@ in {
     group = "lldap";
   };
 
-  users.groups.lldap = {};
+  users.groups.lldap = { };
 
   systemd.services.lldap = {
     serviceConfig.User = "lldap";
@@ -44,7 +49,7 @@ in {
     name = "lldap";
     ensureDBOwnership = true;
   };
-  services.postgresql.ensureDatabases = ["lldap"];
+  services.postgresql.ensureDatabases = [ "lldap" ];
 
   services.nginx.virtualHosts."${fqdn}" = {
     forceSSL = true;

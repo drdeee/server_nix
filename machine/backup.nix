@@ -10,7 +10,7 @@ let
   remoteName = config.systemd.services."restic-backups-remote".name;
   defaultResticConf = {
     initialize = true;
-    paths = config.backupPaths;
+    paths = config.backups.paths;
     rcloneConfigFile = config.sops.secrets."restic/rclone".path;
     pruneOpts = pruneOpts;
     timerConfig = null;
@@ -18,8 +18,16 @@ let
 in
 {
   options = {
-    backupPaths = lib.mkOption {
+    backups.paths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
+    };
+    backups.preScripts = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "echo pre-script" ];
+    };
+    backups.postScripts = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "echo post-script" ];
     };
   };
 
@@ -32,6 +40,8 @@ in
       repository = "rclone:remote:/${remoteBase}";
       passwordFile = config.sops.secrets."restic/passwords/remote".path;
       timerConfig.OnCalendar = "*-*-* 4:00:00";
+      backupPrepareCommand = lib.strings.concatStringsSep " && " config.backups.preScripts;
+      backupCleanupCommand = lib.strings.concatStringsSep " && " config.backups.postScripts;
     };
 
     services.restic.backups.mirror = defaultResticConf // {
