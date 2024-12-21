@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   remoteBase = "ebackup/server";
-  mirrorBase = "SanDisk-Extreme55AE-01/systemlos";
+  mirrorBase = "SanDisk-Extreme55AE-01/systemlosBackup";
   pruneOpts = [
     "--keep-daily 3"
     "--keep-weekly 5"
